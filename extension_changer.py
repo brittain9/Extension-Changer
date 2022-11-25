@@ -8,9 +8,7 @@ def changeFileExtension():
     '''
     Usage on command line: python3 <filename>.py <Directory of Files> <current_extension> <new_extension> [<copy> default = False]
 
-    copy = True; will create new folder inside directory with copied files with new extensions
-
-    :return: True if file extensions changed. False otherwise.
+    copy = True; will create folder inside directory with files with new extension.
     '''
     n = len(sys.argv)
     assert n > 3, "Incorrect usage. Three arguments required!"
@@ -41,11 +39,11 @@ def changeFileExtension():
     # Keep track of # of changed files
     changed = 0
 
-    # If we are copying and copy path already exists, initialize copy path. If not copy_path will be None
+    # If we are copying and copy_path already exists, initialize copy path. If not copy_path will be None
     copy_path = Path(path + new_extension) if os.path.exists(Path(path + new_extension))  and copy is not False else None
 
     # if copy and the path is None, that means we need to create the directory
-    if copy and copy_path is None:
+    if copy is not False and copy_path is None:
         os.mkdir(new_extension)
 
     # Iterate through files in the path
@@ -53,12 +51,10 @@ def changeFileExtension():
         try:
 
             # Find files ending with .current_extension; $ indicates it must be at the end of the file name
+            # BUG: This doesn't work correctly a file named .png.png will turn to .heic.heic;
             if re.search(f"[.{current_extension}]$", file):
-                if not copy:
-                    os.rename(file, file.replace(current_extension, new_extension))
-                    print(f'Changed: {file}')
-                else:
-                    # Create the new path
+                if copy is not False:
+                    # Create the new copy
                     shutil.copy(Path(file), Path(copy_path))
 
                     # Change directory to new folder so we can change extensions
@@ -69,6 +65,9 @@ def changeFileExtension():
                     os.chdir(path)
 
                     print(f'Copied: {file} to \{new_extension}')
+                else:
+                    os.rename(file, file.replace(current_extension, new_extension))
+                    print(f'Changed: {file}')
 
                 changed += 1
 
