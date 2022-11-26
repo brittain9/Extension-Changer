@@ -32,7 +32,7 @@ def change_file_extension() -> bool:
     if n > 4:
         copy = sys.argv[4].lower() == "true"
         
-    if not new_extension in sys.path and copy == True:
+    if not os.path.exists(new_extension) and copy == True:
         os.mkdir(new_extension)
         print(f'New directory created: {new_extension}')
         
